@@ -121,3 +121,9 @@ test('all upstream HTML preserves control identities and submitted values', asyn
     assert.deepEqual(signatures(translateHTML(source,translator(catalog))),signatures(source),file);
   }
 });
+
+
+test('keep the split MikroDash brand intact', () => {
+  const catalog = JSON.parse(readFileSync(new URL('../zh-CN.json', import.meta.url), 'utf8'));
+  assert.equal(translateHTML('<h1>Mikro<span>Dash</span></h1>', translator(catalog)), '<h1>Mikro<span>Dash</span></h1>');
+});
