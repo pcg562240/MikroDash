@@ -5,8 +5,8 @@
   "scripts": {
     "extract": "node cli.mjs extract",
     "check": "node cli.mjs check",
-    "prepare": "node cli.mjs prepare",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "build:sources": "node cli.mjs prepare"
   },
   "dependencies": {
     "parse5": "7.2.1",

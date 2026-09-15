@@ -127,3 +127,9 @@ test('keep the split MikroDash brand intact', () => {
   const catalog = JSON.parse(readFileSync(new URL('../zh-CN.json', import.meta.url), 'utf8'));
   assert.equal(translateHTML('<h1>Mikro<span>Dash</span></h1>', translator(catalog)), '<h1>Mikro<span>Dash</span></h1>');
 });
+
+
+test('installing tooling must not generate a source copy via npm lifecycle hooks', () => {
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  for (const hook of ['prepare', 'preinstall', 'install', 'postinstall']) assert.equal(pkg.scripts[hook], undefined);
+});

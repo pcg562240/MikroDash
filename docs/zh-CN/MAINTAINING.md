@@ -26,6 +26,8 @@ go run ./cmd/webbuild -dir .localization-build/web
 node localization/finish.mjs
 ```
 
+后端测试需要干净的源码目录：先测试，再生成隔离副本。上游路径核验会扫描目录，不识别中文构建目录内的测试副本；已有构建产物时，请在干净 worktree 测试，或先移走自己生成的目录。安装工具不应通过 npm 生命周期钩子自动生成副本。
+
 `prepare` 要求输出目录不存在，防止误覆盖源码。重建时可使用新的、未存在的临时路径作为第三个参数，或先清理自己创建的旧构建目录。
 
 `check` 的报告在 `.localization-report/`。这不是全项目所有字符串的穷举覆盖；抽取器采用保守规则，优先保护业务语义。
