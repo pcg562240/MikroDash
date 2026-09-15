@@ -1,4 +1,6 @@
 # MikroDash
+
+> **简体中文社区版**：请先阅读 [中文说明、预览与维护指南](README.zh-CN.md)。本分支是非官方汉化 fork；以下保留原项目说明。
 ### The Ultimate MikroTik RouterOS Dashboard.
 
 > Real-time MikroTik RouterOS v7 dashboard — streaming binary API, WebSocket, a single static binary.

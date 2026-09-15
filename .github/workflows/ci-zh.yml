@@ -1,0 +1,56 @@
+name: Chinese UI checks
+on:
+  push:
+    branches: [zh-CN, 'update/upstream-*']
+  pull_request:
+    branches: [zh-CN]
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Berlin
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Install pinned tooling
+        run: |
+          npm ci --prefix web --no-audit --no-fund
+          npm ci --prefix localization --no-audit --no-fund
+      - name: Preserve the upstream business source
+        run: node localization/verify-upstream.mjs
+      - name: Translation coverage and safety tests
+        run: |
+          node localization/cli.mjs check
+          npm test --prefix localization
+      - name: Official frontend regression tests
+        run: |
+          npm run typecheck --prefix web
+          npm test --prefix web
+      - name: Official backend tests
+        run: go test ./...
+      - name: Build and typecheck the translated frontend
+        run: |
+          node localization/cli.mjs prepare
+          web/node_modules/.bin/tsc --noEmit -p .localization-build/web/tsconfig.json
+          go run ./cmd/webbuild -dir .localization-build/web
+          node localization/finish.mjs
+      - name: Upload Chinese frontend and coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mikrodash-zh-review
+          path: |
+            .localization-build/web/dist/
+            .localization-report/
+          include-hidden-files: true

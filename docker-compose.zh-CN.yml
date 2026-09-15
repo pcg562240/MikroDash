@@ -1,0 +1,17 @@
+services:
+  mikrodash-zh:
+    build:
+      context: .
+      dockerfile: Dockerfile.zh-CN
+      args:
+        UPSTREAM_IMAGE: ghcr.io/secops-7/mikrodash:0.8.55
+    image: mikrodash-zh:0.8.55-zh.1
+    restart: unless-stopped
+    ports:
+      # Local preview by default. Choose a LAN bind explicitly when deploying.
+      - "127.0.0.1:3082:3081"
+    volumes:
+      # NEVER share a writable /data volume with the running official instance.
+      - mikrodash-zh-preview:/data
+volumes:
+  mikrodash-zh-preview:

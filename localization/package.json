@@ -1,0 +1,15 @@
+{
+  "name": "mikrodash-zh-tooling",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "extract": "node cli.mjs extract",
+    "check": "node cli.mjs check",
+    "prepare": "node cli.mjs prepare",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "parse5": "7.2.1",
+    "typescript": "5.7.3"
+  }
+}

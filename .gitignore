@@ -94,3 +94,9 @@ testdata/.seam.cjs
 
 # Bundled web tests — build output, not fixtures.
 web/test-out/
+
+# Chinese build artifacts and local-only tooling
+.localization-build*/
+.localization-report/
+.localization-cache/
+.localization-preview/

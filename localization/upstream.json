@@ -1,0 +1,6 @@
+{
+  "repository": "SecOps-7/MikroDash",
+  "tag": "v0.8.55",
+  "commit": "77014df29a45c42b355163439a64728ee7f70b9e",
+  "image": "ghcr.io/secops-7/mikrodash:0.8.55"
+}

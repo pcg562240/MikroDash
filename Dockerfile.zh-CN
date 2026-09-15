@@ -1,0 +1,19 @@
+# Keep backend/runtime identical to the matching official release. Only the
+# browser assets are replaced; Node and translation tooling never ship.
+ARG UPSTREAM_IMAGE=ghcr.io/secops-7/mikrodash:0.8.55
+FROM ${UPSTREAM_IMAGE} AS official
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS frontend
+RUN apk add --no-cache nodejs npm
+WORKDIR /src
+COPY . .
+RUN npm ci --prefix localization --no-audit --no-fund \
+    && node localization/cli.mjs check \
+    && npm test --prefix localization \
+    && node localization/cli.mjs prepare /translated \
+    && go run ./cmd/webbuild -dir /translated/web \
+    && node localization/finish.mjs /translated/web/dist
+FROM official
+COPY --from=frontend /translated/web/dist /app/web/dist
+LABEL org.opencontainers.image.title="MikroDash 简体中文社区版" \
+      org.opencontainers.image.source="https://github.com/pcg562240/MikroDash" \
+      org.opencontainers.image.licenses="MIT"

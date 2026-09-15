@@ -1,0 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const meta = JSON.parse(readFileSync('localization/upstream.json', 'utf8'));
+if (!/^v\d+\.\d+\.\d+$/.test(meta.tag)) throw Error('Invalid upstream version');
+const sha = execFileSync('git', ['rev-parse', `${meta.tag}^{commit}`], { encoding: 'utf8' }).trim();
+if (sha !== meta.commit) throw Error('Upstream tag no longer matches reviewed commit');
+const diff = execFileSync('git', ['diff', '--name-only', sha, '--', 'web', 'cmd', 'internal', 'go.mod', 'go.sum', 'third_party'], { encoding: 'utf8' }).trim();
+if (diff) throw Error(`Unexpected business source changes:\n${diff}`);
+const imageTag = `ghcr.io/secops-7/mikrodash:${meta.tag.slice(1)}`;
+if (meta.image !== imageTag && !meta.image.startsWith(imageTag + '@sha256:')) throw Error('Backend image and frontend source versions differ');
+console.log(`Upstream business source unchanged: ${meta.tag} ${sha}`);
