@@ -17,6 +17,15 @@
 | --- | --- |
 | ![中文管理员创建](screenshots/login-mobile.png) | ![中文常规设置](screenshots/settings-mobile.png) |
 
+## 发布验证
+
+[中文镜像发布成功](https://github.com/pcg562240/MikroDash/actions/runs/34937577886)。未提供登录凭据的 GHCR 拉取授权及 manifest 请求返回 HTTP 200，确认公开可访问；manifest 包含 `linux/amd64` 与 `linux/arm64`。
+
+```text
+ghcr.io/pcg562240/mikrodash-zh:0.8.55-zh.1
+sha256:1f59ccda017743e90188184ffe584c8585565f8cc0bb196af732428390aacaf5
+```
+
 ## 更新机制验证
 
 [上游检查首次运行成功](https://github.com/pcg562240/MikroDash/actions/runs/34937263069)，当前已与官方最新稳定版一致，因此没有创建无意义的升级 PR。未来出现新 release 后的合并冲突、文案变化和真实升级 PR 仍需维护者审核，不将本次“无新版本”检查等同于未来升级保证。

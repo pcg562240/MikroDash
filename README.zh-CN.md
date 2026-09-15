@@ -39,13 +39,13 @@ docker compose -f docker-compose.zh-CN.yml down
 
 ### 预构建镜像
 
-发布工作流通过测试并完成发布后，镜像位于：
+首版已通过完整检查并发布，已验证匿名拉取。镜像位于：
 
 ```text
 ghcr.io/pcg562240/mikrodash-zh:0.8.55-zh.1
 ```
 
-以仓库的 **Publish Chinese image** 工作流成功记录及匿名拉取结果为准。建议固定版本，而不是让自动更新工具直接追随 `latest`。镜像支持 `linux/amd64` 与 `linux/arm64`；其他架构尚未纳入中文发布流程。
+[首版发布记录](https://github.com/pcg562240/MikroDash/actions/runs/34937577886)。建议固定版本，而不是让自动更新工具直接追随 `latest`。镜像支持 `linux/amd64` 与 `linux/arm64`；其他架构尚未纳入中文发布流程。
 
 ## 如何跟随官方更新
 
