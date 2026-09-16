@@ -73,6 +73,8 @@ docker build -f Dockerfile.traffic --target collector -t mikrodash-traffic-colle
 
 ## NAS / Portainer 发布与迁移
 
+**已发布：0.8.55-traffic.1**。两个公开镜像均支持 `linux/amd64`、`linux/arm64`，已核验匿名拉取。固定版本与 digest 见 [发布记录](../../docs/zh-CN/TRAFFIC-RELEASE-0.8.55.md)。不要把纯汉化镜像与扩展采集器当作完整扩展界面组合。
+
 `preview` 是本机镜像标签，不是 NAS 能直接拉取的公开镜像。正式发布使用独立的 **Publish traffic extension images** 工作流，版本为 `上游版本-traffic.修订号`；不修改纯汉化版 `latest`。
 
 Portainer image-only Stack 模板见 [`docker-compose.traffic.release.yml`](../../docker-compose.traffic.release.yml)。部署前须核验对应工作流成功、两份镜像公开且支持目标架构，并将两个数据目录占位符替换为实际目录；源码模板本身不表示发布已成功。

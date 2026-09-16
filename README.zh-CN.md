@@ -6,9 +6,9 @@
 
 ## 可选：OpenClash 与设备累计流量扩展
 
-第一期本地实现提供 OpenClash 实时曲线、日/月历史用量、ROS 设备累计排行及基础设施单列。统计服务、加密配置和数据卷独立于官方后端，汉化版默认镜像不包含此扩展。
+第一期提供 OpenClash 实时曲线、日/月历史用量、ROS 设备累计排行及基础设施单列。统计服务、加密配置和数据卷独立于官方后端，汉化版默认镜像不包含此扩展。
 
-详见 [流量扩展说明](extensions/traffic/README.md)。使用 `docker-compose.traffic.yml` 构建本地预览；当前扩展镜像尚未公开发布，也不会自动替换 NAS 实例。每设备“仅代理流量”精确归属不在第一期范围。
+扩展 **0.8.55-traffic.1 已公开发布**，包含 dashboard／collector 两个 `amd64`／`arm64` 镜像，详见 [发布记录](docs/zh-CN/TRAFFIC-RELEASE-0.8.55.md) 和 [流量扩展说明](extensions/traffic/README.md)。Portainer 模板为 `docker-compose.traffic.release.yml`；`docker-compose.traffic.yml` 仍只用于本地构建预览。不会自动替换 NAS 实例，每设备“仅代理流量”精确归属不在第一期范围。
 
 ## 中文范围
 
