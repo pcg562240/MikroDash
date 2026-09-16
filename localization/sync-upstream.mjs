@@ -26,7 +26,7 @@ if (merge.status !== 0) {
 }
 const commit = run('git', ['rev-parse', `${tag}^{commit}`]);
 writeFileSync('localization/upstream.json', JSON.stringify({ ...meta, tag, commit, image: `ghcr.io/secops-7/mikrodash:${tag.slice(1)}` }, null, 2) + '\n');
-for (const path of ['Dockerfile.zh-CN', 'docker-compose.zh-CN.yml']) {
+for (const path of ['Dockerfile.zh-CN', 'docker-compose.zh-CN.yml', 'Dockerfile.traffic', 'docker-compose.traffic.yml']) {
   const old = readFileSync(path, 'utf8');
   if (!old.includes(meta.tag.slice(1))) throw Error(`Image version anchor moved in ${path}`);
   writeFileSync(path, old.replaceAll(meta.tag.slice(1), tag.slice(1)));
@@ -35,7 +35,7 @@ run('npm', ['ci', '--prefix', 'localization', '--no-audit', '--no-fund']);
 run('node', ['localization/cli.mjs', 'extract']);
 const check = spawnSync('node', ['localization/cli.mjs', 'check'], { stdio: 'inherit' });
 const summary = JSON.parse(readFileSync('.localization-report/summary.json', 'utf8'));
-run('git', ['add', 'localization/upstream.json', 'Dockerfile.zh-CN', 'docker-compose.zh-CN.yml']);
+run('git', ['add', 'localization/upstream.json', 'Dockerfile.zh-CN', 'docker-compose.zh-CN.yml', 'Dockerfile.traffic', 'docker-compose.traffic.yml']);
 run('git', ['commit', '-m', `Track ${tag}; require translation and regression review`]);
 run('git', ['push', 'origin', branch]);
 const body = `## Upstream ${tag}\n\n${release.html_url}\n\nTranslation inventory: ${summary.translated}/${summary.strings}; ${summary.untranslated} preserved/untranslated.\n\n${check.status === 0 ? 'Existing coverage policy passes.' : '**New wording or obsolete exceptions require review. CI must pass before merge.**'}\n\n- [ ] Review new strings and safety adapter\n- [ ] Pass Chinese UI checks (explicitly dispatched below)\n- [ ] Review UI screenshots\n\nNo automatic merge, image release, or NAS deployment. Public source only; no production router credentials.`;

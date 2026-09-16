@@ -39,12 +39,23 @@ jobs:
           npm test --prefix web
       - name: Official backend tests
         run: go test ./...
+      - name: Optional traffic extension tests
+        run: |
+          go test -race ./extensions/traffic/...
+          npm test --prefix extensions/traffic
       - name: Build and typecheck the translated frontend
         run: |
           node localization/cli.mjs prepare
           web/node_modules/.bin/tsc --noEmit -p .localization-build/web/tsconfig.json
           go run ./cmd/webbuild -dir .localization-build/web
           node localization/finish.mjs
+      - name: Build optional traffic extension frontend
+        run: |
+          node localization/cli.mjs prepare .localization-build-traffic
+          node extensions/traffic/adapter.mjs .localization-build-traffic
+          web/node_modules/.bin/tsc --noEmit -p .localization-build-traffic/web/tsconfig.json
+          go run ./cmd/webbuild -dir .localization-build-traffic/web
+          node localization/finish.mjs .localization-build-traffic/web/dist
       - name: Upload Chinese frontend and coverage report
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,0 +1,41 @@
+# Optional extension build. Official backend files and runtime stay unchanged.
+ARG UPSTREAM_IMAGE=ghcr.io/secops-7/mikrodash:0.8.55
+FROM ${UPSTREAM_IMAGE} AS official
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS build
+ARG TARGETOS TARGETARCH
+ARG GOPROXY=https://proxy.golang.org,direct
+ENV GOPROXY=${GOPROXY}
+RUN apk add --no-cache nodejs npm
+WORKDIR /src
+COPY go.mod go.sum ./
+COPY third_party ./third_party
+RUN go mod download
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/go-build npm ci --prefix localization --no-audit --no-fund \
+ && node localization/cli.mjs check \
+ && npm test --prefix localization \
+ && npm test --prefix extensions/traffic \
+ && go test ./extensions/traffic/... \
+ && node localization/cli.mjs prepare /translated \
+ && node extensions/traffic/adapter.mjs /translated \
+ && go run ./cmd/webbuild -dir /translated/web \
+ && node localization/finish.mjs /translated/web/dist
+RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+ go build -trimpath -ldflags="-s -w" -o /out/traffic-extension ./extensions/traffic/cmd/traffic
+
+FROM official AS dashboard
+COPY --from=build /translated/web/dist /app/web/dist
+LABEL org.opencontainers.image.title="MikroDash 中文版 · 流量扩展界面" \
+ org.opencontainers.image.source="https://github.com/pcg562240/MikroDash" \
+ org.opencontainers.image.licenses="MIT"
+
+FROM alpine:3.20 AS collector
+RUN apk add --no-cache ca-certificates tzdata
+COPY --from=build /out/traffic-extension /usr/local/bin/traffic-extension
+VOLUME ["/traffic-data"]
+EXPOSE 3083
+ENTRYPOINT ["/usr/local/bin/traffic-extension"]
+CMD ["-listen",":3083","-upstream","http://dashboard:3081","-data","/traffic-data"]
+LABEL org.opencontainers.image.title="MikroDash 独立流量统计服务" \
+ org.opencontainers.image.source="https://github.com/pcg562240/MikroDash" \
+ org.opencontainers.image.licenses="MIT"

@@ -1,0 +1,24 @@
+# Portainer example: replace both host directory placeholders before deploying.
+# This is NOT the local-preview Stack and must not run beside another writer of /data.
+services:
+  mikrodash-zh:
+    image: ghcr.io/pcg562240/mikrodash-traffic-dashboard:0.8.55-traffic.1
+    container_name: mikrodash-zh
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - /PATH/TO/EXISTING/MIKRODASH_DATA:/data
+  traffic:
+    image: ghcr.io/pcg562240/mikrodash-traffic-collector:0.8.55-traffic.1
+    container_name: mikrodash-traffic
+    restart: unless-stopped
+    depends_on:
+      - mikrodash-zh
+    command: ["-listen", ":3083", "-upstream", "http://mikrodash-zh:3081", "-data", "/traffic-data"]
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "3082:3083"
+    volumes:
+      - /PATH/TO/SEPARATE/TRAFFIC_DATA:/traffic-data

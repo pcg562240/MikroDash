@@ -1,0 +1,8 @@
+import{test}from'node:test';import assert from'node:assert/strict';
+import{mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync}from'node:fs';import{tmpdir}from'node:os';import{join}from'node:path';
+import{bytes,orderDevices,stale}from'../ui/format.js';import{adapt}from'../adapter.mjs';
+test('byte formatting is not bits or decimal GB',()=>{assert.equal(bytes(1048576),'1 MiB');assert.equal(bytes(0),'0 B');assert.equal(bytes(-1),'—');assert.equal(bytes(NaN),'—')});
+test('rank independently by upload/download and do not mutate',()=>{const a=[{mac:'A',download:9,upload:1},{mac:'B',download:2,upload:20}];assert.equal(orderDevices(a,'download')[0].mac,'A');assert.equal(orderDevices(a,'upload')[0].mac,'B');assert.equal(orderDevices(a,'total')[0].mac,'B');assert.equal(a[0].mac,'A')});
+test('stale and future clocks cannot show healthy zero',()=>{assert.equal(stale(0),true);assert.equal(stale(10,10),false);assert.equal(stale(1,99999),true);assert.equal(stale(999999,1),true)});
+test('adapter applies once to isolated sources, fails on upstream drift',()=>{const d=mkdtempSync(join(tmpdir(),'md-ext-'));try{mkdirSync(join(d,'web/src/pages'),{recursive:true});const file=join(d,'web/src/pages/dashboard.ts');writeFileSync(file,'export function initDashboard(socket: Socket): void {\n}');adapt(d);assert.match(readFileSync(file,'utf8'),/initTrafficExtension\(socket\)/);assert.throws(()=>adapt(d),/already applied/)}finally{rmSync(d,{recursive:true,force:true})}});
+test('UI never uses raw HTML injection or secret query parameters',()=>{const js=readFileSync(new URL('../ui/app.js',import.meta.url),'utf8');assert.doesNotMatch(js,/innerHTML|insertAdjacentHTML|localStorage|[?&]token=/);assert.match(js,/textContent/)});

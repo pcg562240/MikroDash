@@ -6,6 +6,7 @@
 - `upstream`：`SecOps-7/MikroDash`，只从稳定 release 引入更新。
 - `main` 不参与中文构建。同步流程将官方 release 合并到更新分支，再由 PR 合入 `zh-CN`。
 - 官方源码保持原样，不手工编辑生成目录。中文适配集中在 `localization/`。
+- 可选流量功能集中在 `extensions/traffic/`，使用独立服务/数据卷和隔离构建时 UI 锚点；不得把统计业务混入翻译字典。CI 同时检查扩展测试和适配后的类型/构建；上游同步也更新 `Dockerfile.traffic` 与 `docker-compose.traffic.yml` 的基础镜像版本。
 
 ## 本地检查
 
@@ -46,6 +47,7 @@ node localization/finish.mjs
 - **Chinese UI checks**：基线核验、文案检查、中文回归测试、原项目前后端测试、中文构建与类型检查。
 - **Check upstream releases**：每天及手动触发。GitHub token 创建 PR 不会自动触发普通 PR CI，因此脚本会显式触发检查工作流。
 - **Publish Chinese image**：只允许在 `zh-CN` 手动执行；先检查，后发布 `amd64` / `arm64` 镜像。不会发布到官方命名空间，不会连接 NAS。
+- **Publish traffic extension images**：可选扩展的独立手动发布，先运行同一完整 CI，再发布 `mikrodash-traffic-dashboard` 与 `mikrodash-traffic-collector` 的 `amd64` / `arm64` 镜像；版本格式为 `上游版本-traffic.修订号`，不更新原汉化镜像的 `latest`。两份包首次发布后需核验 public 可见性和匿名拉取。每次用新修订号，禁止覆盖已发布标签；`docker-compose.traffic.release.yml` 仅在发布新扩展版本时显式更新，不随未发布的上游 PR 提前改变。
 
 首次启用需检查仓库 Settings → Actions。允许工作流创建 PR，并启用 fork 的定时工作流。可通过手动运行同步检查验证权限；没有新版本时只报告版本已一致。
 

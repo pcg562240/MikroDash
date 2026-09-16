@@ -1,0 +1,32 @@
+# Local preview only. Never reuse the live application's writable data volume.
+services:
+  dashboard:
+    image: mikrodash-traffic-dashboard:preview
+    build:
+      context: .
+      dockerfile: Dockerfile.traffic
+      target: dashboard
+      args:
+        UPSTREAM_IMAGE: ghcr.io/secops-7/mikrodash:0.8.55
+    restart: unless-stopped
+    volumes:
+      - traffic-preview-dashboard:/data
+    # No host port: all browser traffic goes through the authenticated gateway.
+  traffic:
+    image: mikrodash-traffic-collector:preview
+    build:
+      context: .
+      dockerfile: Dockerfile.traffic
+      target: collector
+      args:
+        UPSTREAM_IMAGE: ghcr.io/secops-7/mikrodash:0.8.55
+    restart: unless-stopped
+    depends_on:
+      - dashboard
+    ports:
+      - "127.0.0.1:3084:3083"
+    volumes:
+      - traffic-preview-statistics:/traffic-data
+volumes:
+  traffic-preview-dashboard:
+  traffic-preview-statistics:
